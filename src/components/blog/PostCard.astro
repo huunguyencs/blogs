@@ -1,0 +1,58 @@
+---
+import { slugify } from '../../utils/slugify';
+import { formatDate } from '../../utils/posts';
+import { getReadingTime } from '../../utils/readingTime';
+
+interface Props {
+  title: string;
+  description: string;
+  date: Date;
+  category: string;
+  image?: { src: string; alt: string };
+  slug: string;
+  rawContent: string;
+}
+
+const { title, description, date, category, image, slug, rawContent } = Astro.props;
+const readingTime = getReadingTime(rawContent);
+const href = `/blog/${slug}`;
+---
+
+<a href={href} class="group block">
+  <!-- Image -->
+  <div class="aspect-[3/2] overflow-hidden rounded-2xl bg-gradient-to-br from-surface-100 to-surface-200 mb-5">
+    {image && (
+      <img
+        src={image.src}
+        alt={image.alt}
+        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+        loading="lazy"
+        onerror="this.style.display='none'"
+      />
+    )}
+  </div>
+
+  <!-- Meta row -->
+  <div class="flex items-center gap-3 mb-3">
+    <span class="text-[11px] font-bold tracking-widest uppercase text-primary-600">
+      {category}
+    </span>
+    <span class="text-surface-300">&middot;</span>
+    <span class="text-[11px] font-medium text-muted tracking-wide">{readingTime}</span>
+  </div>
+
+  <!-- Title -->
+  <h3 class="font-display text-xl lg:text-2xl text-ink leading-[1.2] tracking-tight group-hover:text-surface-600 transition-colors line-clamp-2">
+    {title}
+  </h3>
+
+  <!-- Description -->
+  <p class="mt-2 text-sm text-muted leading-relaxed line-clamp-2">
+    {description}
+  </p>
+
+  <!-- Date -->
+  <time datetime={date.toISOString()} class="block mt-4 text-xs text-surface-400">
+    {formatDate(date)}
+  </time>
+</a>

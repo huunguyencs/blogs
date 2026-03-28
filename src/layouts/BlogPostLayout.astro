@@ -1,0 +1,120 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import TagList from '../components/blog/TagList.astro';
+import TableOfContents from '../components/blog/TableOfContents.astro';
+import ShareButtons from '../components/blog/ShareButtons.astro';
+import { formatDate } from '../utils/posts';
+import { getReadingTime } from '../utils/readingTime';
+import { slugify } from '../utils/slugify';
+
+interface Props {
+  title: string;
+  description: string;
+  date: Date;
+  updatedDate?: Date;
+  author?: string;
+  category: string;
+  tags?: string[];
+  image?: { src: string; alt: string };
+  headings: { depth: number; slug: string; text: string }[];
+  rawContent: string;
+}
+
+const {
+  title,
+  description,
+  date,
+  updatedDate,
+  author = 'Blog Author',
+  category,
+  tags = [],
+  image,
+  headings,
+  rawContent,
+} = Astro.props;
+
+const readingTime = getReadingTime(rawContent);
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  image={image?.src}
+  type="article"
+  publishedDate={date}
+  updatedDate={updatedDate}
+  tags={tags}
+  author={author}
+>
+  <article>
+    <!-- Article header -->
+    <header class="max-w-3xl mx-auto px-6 lg:px-10 pt-10 lg:pt-16 pb-8">
+      <div class="flex items-center gap-3 mb-6">
+        <a href={`/category/${slugify(category)}`} class="text-[11px] font-bold tracking-[0.2em] uppercase text-primary-600 hover:text-primary-800 transition-colors">
+          {category}
+        </a>
+        <span class="text-surface-300">&middot;</span>
+        <span class="text-[11px] font-medium text-muted tracking-wide">{readingTime}</span>
+      </div>
+
+      <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl text-ink leading-[1.08] tracking-tight">
+        {title}
+      </h1>
+
+      <p class="mt-5 text-lg text-muted leading-relaxed max-w-2xl">{description}</p>
+
+      <div class="mt-8 flex items-center gap-4 text-sm text-surface-400">
+        <span>By <strong class="text-ink font-medium">{author}</strong></span>
+        <span>&middot;</span>
+        <time datetime={date.toISOString()}>{formatDate(date)}</time>
+        {updatedDate && (
+          <>
+            <span>&middot;</span>
+            <span>Updated <time datetime={updatedDate.toISOString()}>{formatDate(updatedDate)}</time></span>
+          </>
+        )}
+      </div>
+
+      <hr class="editorial-rule mt-8" />
+    </header>
+
+    <!-- Hero image -->
+    <div class="max-w-4xl mx-auto px-6 lg:px-10 mb-10">
+      <div class="w-full rounded-2xl overflow-hidden aspect-[2/1] bg-gradient-to-br from-surface-100 to-surface-200">
+        {image && (
+          <img
+            src={image.src}
+            alt={image.alt}
+            class="w-full h-full object-cover"
+            loading="eager"
+            onerror="this.style.display='none'"
+          />
+        )}
+      </div>
+    </div>
+
+    <!-- Content grid: article + TOC sidebar -->
+    <div class="max-w-[1400px] mx-auto px-6 lg:px-10 lg:grid lg:grid-cols-[1fr_240px] lg:gap-16">
+      <div class="max-w-3xl mx-auto lg:mx-0 w-full">
+        <div class="prose prose-lg prose-stone max-w-none prose-headings:font-display prose-headings:tracking-tight prose-headings:scroll-mt-24 prose-a:text-primary-600 prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-pre:bg-surface-900 prose-pre:border prose-pre:border-surface-800">
+          <slot />
+        </div>
+
+        <!-- Tags and share -->
+        <div class="mt-16 pt-8 border-t border-border">
+          {tags.length > 0 && <TagList tags={tags} />}
+          <div class="mt-6">
+            <ShareButtons title={title} url={Astro.url.href} />
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar TOC (desktop) -->
+      <aside class="hidden lg:block">
+        <div class="sticky top-28">
+          <TableOfContents headings={headings} />
+        </div>
+      </aside>
+    </div>
+  </article>
+</BaseLayout>

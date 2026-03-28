@@ -1,0 +1,53 @@
+---
+import '../styles/global.css';
+import SEOHead from '../components/seo/SEOHead.astro';
+import JsonLd from '../components/seo/JsonLd.astro';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  type?: 'website' | 'article';
+  publishedDate?: Date;
+  updatedDate?: Date;
+  tags?: string[];
+  author?: string;
+  noindex?: boolean;
+}
+
+const props = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <SEOHead
+      title={props.title}
+      description={props.description}
+      image={props.image}
+      type={props.type}
+      publishedDate={props.publishedDate}
+      updatedDate={props.updatedDate}
+      tags={props.tags}
+      noindex={props.noindex}
+    />
+    <JsonLd
+      type={props.type ?? 'website'}
+      title={props.title}
+      description={props.description}
+      image={props.image}
+      publishedDate={props.publishedDate}
+      updatedDate={props.updatedDate}
+      author={props.author}
+    />
+  </head>
+  <body class="min-h-screen flex flex-col bg-paper text-ink">
+    <Header />
+    <main class="flex-1">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

@@ -1,0 +1,39 @@
+---
+import { formatDate } from '../../utils/posts';
+import { slugify } from '../../utils/slugify';
+
+interface Props {
+  title: string;
+  date: Date;
+  category: string;
+  image?: { src: string; alt: string };
+  slug: string;
+}
+
+const { title, date, category, image, slug } = Astro.props;
+const href = `/blog/${slug}`;
+---
+
+<a href={href} class="group flex gap-5 items-start py-5 border-b border-border last:border-0">
+  <!-- Thumbnail -->
+  <div class="w-24 h-24 flex-shrink-0 rounded-xl overflow-hidden bg-gradient-to-br from-surface-100 to-surface-200">
+    {image && (
+      <img
+        src={image.src}
+        alt={image.alt}
+        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+        loading="lazy"
+        onerror="this.style.display='none'"
+      />
+    )}
+  </div>
+
+  <!-- Content -->
+  <div class="flex-1 min-w-0 pt-0.5">
+    <span class="text-[10px] font-bold tracking-widest uppercase text-primary-600">{category}</span>
+    <h4 class="mt-1 font-display text-lg text-ink leading-snug line-clamp-2 group-hover:text-surface-600 transition-colors">
+      {title}
+    </h4>
+    <time datetime={date.toISOString()} class="block mt-1.5 text-xs text-surface-400">{formatDate(date)}</time>
+  </div>
+</a>

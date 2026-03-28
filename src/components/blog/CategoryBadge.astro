@@ -1,0 +1,26 @@
+---
+import { slugify } from '../../utils/slugify';
+
+interface Props {
+  category: string;
+  variant?: 'default' | 'light';
+  linked?: boolean;
+}
+
+const { category, variant = 'default', linked = true } = Astro.props;
+const href = `/category/${slugify(category)}`;
+
+const classes = variant === 'light'
+  ? 'text-[10px] font-bold tracking-[0.2em] uppercase text-white/60 hover:text-white/90'
+  : 'text-[11px] font-bold tracking-[0.2em] uppercase text-primary-600 hover:text-primary-800';
+---
+
+{linked ? (
+  <a href={href} class:list={['transition-colors', classes]}>
+    {category}
+  </a>
+) : (
+  <span class:list={[classes]}>
+    {category}
+  </span>
+)}

@@ -1,0 +1,13 @@
+---
+interface Props {
+  time: string;
+  variant?: 'default' | 'light';
+}
+
+const { time, variant = 'default' } = Astro.props;
+const classes = variant === 'light' ? 'text-white/50' : 'text-muted';
+---
+
+<span class:list={['text-[11px] font-medium tracking-wide', classes]}>
+  {time}
+</span>

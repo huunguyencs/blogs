@@ -1,0 +1,69 @@
+---
+interface Props {
+  type: 'website' | 'article';
+  title: string;
+  description: string;
+  url?: string;
+  image?: string;
+  publishedDate?: Date;
+  updatedDate?: Date;
+  author?: string;
+}
+
+const {
+  type,
+  title,
+  description,
+  url = Astro.url.href,
+  image,
+  publishedDate,
+  updatedDate,
+  author = 'Blog Author',
+} = Astro.props;
+
+const siteName = 'AI Blog';
+const siteUrl = Astro.site?.toString() ?? '';
+
+function buildJsonLd() {
+  if (type === 'article') {
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      headline: title,
+      description,
+      url,
+      image: image ? new URL(image, Astro.site).toString() : undefined,
+      datePublished: publishedDate?.toISOString(),
+      dateModified: (updatedDate ?? publishedDate)?.toISOString(),
+      author: {
+        '@type': 'Person',
+        name: author,
+      },
+      publisher: {
+        '@type': 'Organization',
+        name: siteName,
+        url: siteUrl,
+      },
+      mainEntityOfPage: {
+        '@type': 'WebPage',
+        '@id': url,
+      },
+    };
+  }
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: siteName,
+    url: siteUrl,
+    description,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: `${siteUrl}blog/?q={search_term_string}`,
+      'query-input': 'required name=search_term_string',
+    },
+  };
+}
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(buildJsonLd())} />

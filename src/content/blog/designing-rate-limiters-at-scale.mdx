@@ -1,0 +1,252 @@
+---
+title: "Designing Rate Limiters at Scale"
+description: "How to build distributed rate limiters that handle millions of requests using token buckets, sliding windows, and Redis-backed architectures."
+date: 2026-03-28
+author: "Blog Author"
+category: "System Design"
+tags: ["rate-limiting", "distributed-systems", "redis", "api-design", "scalability"]
+image:
+  src: "https://res.cloudinary.com/huunguyencs/image/upload/v1774708312/blog/designing-rate-limiters-at-scale.jpg"
+  alt: "Server racks in a data center representing distributed rate limiting infrastructure"
+featured: false
+draft: false
+---
+
+Every API you've ever used has a rate limiter sitting between you and the actual service. It's the bouncer at the door — quietly counting requests, deciding who gets in, and handing out HTTP 429s to anyone who pushes too hard. Building one for a single server is straightforward. Building one that works across dozens of nodes handling millions of requests per second? That's where things get interesting.
+
+## Why Rate Limiting Matters
+
+Rate limiting isn't just about protecting your servers from abuse. It serves multiple critical functions:
+
+- **Fair resource allocation** — prevents a single tenant from monopolizing shared infrastructure
+- **Cost control** — limits runaway usage that could inflate cloud bills
+- **Stability under load** — provides backpressure before systems reach breaking point
+- **Security** — mitigates brute-force attacks, credential stuffing, and DDoS attempts
+
+Without rate limiting, a single misconfigured client can take down your entire platform. The 2024 incident where a gaming company's API went down because one partner's retry loop created a cascade failure? A properly designed rate limiter would have contained that to a single tenant.
+
+## The Core Algorithms
+
+There are five major rate limiting algorithms, each with distinct tradeoffs. Picking the right one depends on your specific requirements around burst tolerance, memory usage, and fairness.
+
+### Fixed Window Counter
+
+The simplest approach. Divide time into fixed intervals (say, 1-minute windows) and count requests per identity in each window.
+
+```
+Window: 12:00:00 - 12:00:59 → counter: 87/100
+Window: 12:01:00 - 12:01:59 → counter: 12/100
+```
+
+**The problem:** boundary amplification. A client can send 100 requests at 12:00:59 and another 100 at 12:01:00 — effectively doubling their rate in a 2-second span. For internal dashboards or non-critical endpoints, this might be acceptable. For payment APIs, it's not.
+
+### Sliding Window Log
+
+Keeps a timestamp log of every request. When a new request arrives, remove entries older than the window duration, count what remains, and decide.
+
+```python
+def is_allowed(user_id, limit, window_secs):
+    now = time.time()
+    cutoff = now - window_secs
+    # Remove expired entries
+    request_log[user_id] = [
+        ts for ts in request_log[user_id] if ts > cutoff
+    ]
+    if len(request_log[user_id]) < limit:
+        request_log[user_id].append(now)
+        return True
+    return False
+```
+
+Perfectly accurate, but memory-hungry. At 10,000 requests per second, you're storing 10,000 timestamps per window per user. For high-volume APIs, this doesn't scale.
+
+### Sliding Window Counter
+
+The practical compromise. Blend the current window's count with the previous window's count based on how far into the current window you are:
+
+```
+effective_count = prev_window_count * overlap_ratio + current_window_count
+```
+
+If you're 30% into the current minute and the previous minute had 70 requests while the current has 20:
+
+```
+effective_count = 70 * 0.7 + 20 = 69
+```
+
+This eliminates boundary spikes while using roughly the same memory as fixed windows. It's the go-to choice for most public-facing APIs.
+
+### Token Bucket
+
+Model capacity as tokens that accumulate over time. Each request consumes a token. Tokens refill at a steady rate up to a maximum bucket size.
+
+```python
+class TokenBucket:
+    def __init__(self, rate, capacity):
+        self.rate = rate          # tokens per second
+        self.capacity = capacity  # max burst size
+        self.tokens = capacity
+        self.last_refill = time.time()
+
+    def allow(self):
+        now = time.time()
+        elapsed = now - self.last_refill
+        self.tokens = min(
+            self.capacity,
+            self.tokens + elapsed * self.rate
+        )
+        self.last_refill = now
+
+        if self.tokens >= 1:
+            self.tokens -= 1
+            return True
+        return False
+```
+
+The token bucket is often the strongest default for developer-facing APIs. It enforces a predictable long-term rate while allowing controlled bursts — reflecting how real clients actually behave. An idle client accumulates tokens and can burst briefly without being throttled, which feels natural to API consumers.
+
+### Leaky Bucket
+
+A queue that drains at a constant rate. Incoming requests join the queue; if it's full, they're rejected. Unlike token bucket, leaky bucket produces perfectly smooth output traffic — no bursts at all.
+
+Best suited for traffic shaping scenarios where downstream systems require a steady, predictable flow. Less common for API rate limiting because it penalizes legitimate burst patterns.
+
+## Choosing the Right Algorithm
+
+| Algorithm | Burst Tolerance | Memory | Accuracy | Best For |
+|-----------|----------------|--------|----------|----------|
+| Fixed Window | High at edges | Very Low | Low | Internal/non-critical APIs |
+| Sliding Window Log | None | High | Perfect | Security-sensitive endpoints |
+| Sliding Window Counter | Low-Medium | Low | High | Public APIs at scale |
+| Token Bucket | Controlled | Low | High | Developer-facing APIs |
+| Leaky Bucket | None | Low | High | Traffic shaping |
+
+For most teams building public APIs, **token bucket** or **sliding window counter** will be the right choice. Token bucket if you want to allow controlled bursts, sliding window counter if you want stricter fairness.
+
+## Going Distributed: The Hard Part
+
+A single-node rate limiter with an in-memory hash map works fine until you need high availability or horizontal scaling. The moment you add a second node, you face a fundamental problem: without coordination, each node independently allows traffic, effectively multiplying your rate limit by the number of nodes.
+
+### Redis as the Coordination Layer
+
+Redis is the industry standard for distributed rate limiting. Its sub-millisecond latency, atomic operations (`INCR`, `EXPIRE`), and built-in TTL support make it purpose-built for this use case.
+
+A basic sliding window counter in Redis using Lua for atomicity:
+
+```lua
+-- Sliding window counter in Redis
+local key = KEYS[1]
+local window = tonumber(ARGV[1])
+local limit = tonumber(ARGV[2])
+local now = tonumber(ARGV[3])
+
+local window_start = now - window
+-- Remove expired entries
+redis.call('ZREMRANGEBYSCORE', key, 0, window_start)
+-- Count current entries
+local count = redis.call('ZCARD', key)
+
+if count < limit then
+    redis.call('ZADD', key, now, now .. '-' .. math.random())
+    redis.call('EXPIRE', key, window)
+    return 1  -- allowed
+end
+return 0  -- rejected
+```
+
+Wrapping operations in Lua scripts ensures atomicity — critical for preventing race conditions where two requests simultaneously read the count, both see it's under the limit, and both increment it past the threshold.
+
+### The Consistency vs. Availability Tradeoff
+
+Distributed rate limiters force you to pick a position on the CAP spectrum:
+
+**Strong consistency** means every node sees exactly the same counter state. You get accurate enforcement but pay with higher latency (cross-node coordination on every request) and reduced availability during network partitions.
+
+**Eventual consistency** means nodes may temporarily disagree on counts. You get lower latency and higher availability, but allow temporary overages. For most rate limiting use cases, slightly overshooting the limit is acceptable — you're protecting against abuse, not billing to the exact request.
+
+In practice, most systems choose eventual consistency with periodic synchronization. Ably's distributed rate limiter, for example, uses a centralized Account Master model where nodes report stats roughly every two seconds and receive suppression factors in return. The key insight from their implementation: track "counterfactual" stats — messages that *would have* been sent if rejections hadn't occurred — to prevent oscillatory behavior where the rate bounces between zero and excessive levels.
+
+### Handling Race Conditions
+
+Even with Redis, race conditions lurk:
+
+1. **Read-then-write races** — two requests read the counter simultaneously, both see room, both write. Solution: use atomic Lua scripts or Redis transactions (`MULTI`/`EXEC`).
+
+2. **Clock skew** — distributed nodes may disagree on the current time. Solution: use Redis server time (`TIME` command) instead of client time, or accept small inaccuracies.
+
+3. **Redis failover gaps** — during Redis primary failover, some requests may bypass limits. Solution: deploy Redis Sentinel or Cluster with replication, and accept that brief windows of over-admission are preferable to dropping all traffic.
+
+## Architecture Patterns
+
+### API Gateway Rate Limiting
+
+The most common pattern. Your rate limiter sits as middleware at the API gateway layer, inspecting every request before it reaches backend services.
+
+```
+Client → Load Balancer → API Gateway (rate limiter) → Backend Services
+                              ↕
+                           Redis Cluster
+```
+
+This works well when you have a single entry point. Kong, Envoy, and NGINX all support rate limiting plugins backed by Redis.
+
+### Sidecar Pattern
+
+For microservice architectures where services need per-service rate limits, deploy the rate limiter as a sidecar alongside each service. Each sidecar communicates with the shared Redis cluster.
+
+This gives you per-service granularity without routing all traffic through a single gateway, but increases the number of Redis connections.
+
+### Multi-Tier Rate Limiting
+
+Production systems often layer multiple rate limiters:
+
+- **Global tier** — protects the entire platform (e.g., 10M requests/minute total)
+- **Account tier** — per-tenant limits based on plan (e.g., 1000 req/min for free tier)
+- **Endpoint tier** — per-endpoint limits for expensive operations (e.g., 10 req/min for report generation)
+
+Each tier can use a different algorithm. You might use a token bucket at the account level (allowing bursts) but a fixed window at the global level (simple and fast).
+
+## Production Considerations
+
+### Response Headers
+
+Always include rate limit information in response headers so clients can self-regulate:
+
+```
+X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 43
+X-RateLimit-Reset: 1711584060
+Retry-After: 30
+```
+
+This is the difference between a rate limiter that frustrates developers and one they appreciate. When clients know their remaining quota, they can implement exponential backoff with jitter instead of blindly hammering your API.
+
+### Graceful Degradation
+
+If your Redis cluster goes down, you have two choices:
+
+1. **Fail open** — allow all requests through. Your backend may get overloaded, but service continues.
+2. **Fail closed** — reject all requests. Safe but means a Redis outage becomes a full service outage.
+
+Most teams choose fail open with a local in-memory fallback. Each node maintains a rough local counter as a safety net, knowing it won't be perfectly accurate but will prevent total chaos.
+
+### Key Design for Multi-Tenancy
+
+Structure your Redis keys to support flexible querying:
+
+```
+ratelimit:{tenant_id}:{endpoint}:{window}
+```
+
+This lets you enforce limits at different granularities and makes it easy to adjust limits per tenant without redeploying. Store tier configurations in a separate config store and cache them locally with short TTLs.
+
+## Key Takeaways
+
+1. **Start with token bucket or sliding window counter** — they cover 90% of use cases with good tradeoffs between accuracy and performance.
+2. **Use Redis with Lua scripts** — atomic operations are non-negotiable in distributed environments. Race conditions will bite you otherwise.
+3. **Choose eventual consistency** — for rate limiting, slightly overshooting is almost always acceptable. Don't sacrifice latency for perfect accuracy.
+4. **Layer your limits** — global, account, and endpoint tiers give you defense in depth.
+5. **Communicate limits to clients** — response headers and clear 429 messages with `Retry-After` reduce support tickets and prevent retry storms.
+6. **Plan for Redis failure** — fail open with local fallbacks beats fail closed for most workloads.
+
+Rate limiting is one of those systems that's easy to build a basic version of and remarkably hard to get right at scale. The algorithms are well-understood, but the distributed coordination, failure modes, and operational concerns are where the real engineering happens. Start simple, measure everything, and evolve your design as your traffic patterns reveal what actually matters.

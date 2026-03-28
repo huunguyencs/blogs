@@ -1,0 +1,130 @@
+---
+title: "AI Harness Design for Long-Running Apps"
+description: "How splitting AI agents into generators and evaluators creates feedback loops that produce dramatically better software."
+date: 2026-03-28
+author: "Blog Author"
+category: "AI Engineering"
+tags: ["ai-agents", "claude", "software-architecture", "llm", "agentic-coding"]
+image:
+  src: "https://res.cloudinary.com/huunguyencs/image/upload/v1774687032/blog/ai-harness-design-long-running-apps.jpg"
+  alt: "AI circuit board representing harness design for long-running agent applications"
+featured: false
+draft: false
+---
+
+AI coding agents are impressive — until you ask them to build something complex. Give Claude a simple prompt and it'll produce decent code in minutes. But ask it to build a full-stack app with polished UI, working game mechanics, or a digital audio workstation? That's where things break down.
+
+Anthropic's engineering team tackled this head-on with **harness design** — a pattern where multiple specialized agents collaborate in structured feedback loops. The results speak for themselves: a solo agent spent 20 minutes and $9 producing a game with broken mechanics, while a multi-agent harness spent 6 hours and $200 producing a feature-rich app with working physics, AI-generated sprites, and intuitive design.
+
+Here's how it works, broken down simply.
+
+## The Two Core Problems
+
+### 1. Context Anxiety
+
+As an AI agent works longer, its context window fills up. The model starts to "feel" cramped — it rushes to finish, cuts corners, or stops mid-task. Think of it like writing a novel on a whiteboard that's almost full. You start abbreviating, skipping details, and wrapping up prematurely.
+
+**Solutions:**
+- **Context resets** — Wipe the slate clean and start fresh with a summary of progress
+- **Context compaction** — Summarize older context in-place to free up room while maintaining continuity
+
+### 2. Self-Evaluation Bias
+
+Ask an AI to review its own work and it'll say "looks great!" almost every time. This is like grading your own homework — you're blind to your own mistakes, especially on subjective tasks like UI design or code architecture.
+
+**Solution:** Use a *separate* agent as the evaluator. External critique consistently outperforms self-review.
+
+## The Architecture: Split Generator and Evaluator
+
+The core insight is simple: **don't let one agent do everything.** Instead, split responsibilities:
+
+| Role | Job |
+|------|-----|
+| **Generator** | Writes the code, builds features |
+| **Evaluator** | Tests the output, provides specific feedback |
+
+The evaluator doesn't just eyeball the code — it uses tools like Playwright to actually *run* the application, take screenshots, click buttons, and file detailed bug reports. The generator then iterates based on this feedback.
+
+This creates a feedback loop: build → test → critique → fix → repeat. Typically 5–15 cycles for frontend work.
+
+## Full-Stack: Three Agents Are Better Than One
+
+For complex full-stack apps, Anthropic extended this to three agents:
+
+### Planner
+Takes a short prompt ("build a game maker") and expands it into a full product spec. It focuses on *what* to build, not *how* — describing features and user experience rather than implementation details.
+
+### Generator
+Implements features in sprints using a React + FastAPI + PostgreSQL stack. It maintains version control with git and does a quick self-check before handing off to QA.
+
+### Evaluator
+Runs the actual application with Playwright, testing against pre-agreed "sprint contracts" — clear success criteria negotiated before each development cycle. It grades across four dimensions:
+
+- **Product depth** — Does it do what it should?
+- **Functionality** — Does it actually work?
+- **Visual design** — Does it look good?
+- **Code quality** — Is it well-structured?
+
+These agents communicate through structured files rather than direct conversation, keeping context clean and focused.
+
+## Real Results
+
+### Game Maker (Opus 4.5)
+
+**Solo agent:** 20 min, $9 → Functional UI but broken gameplay. Core mechanics didn't work.
+
+**Multi-agent harness:** 6 hours, $200 → Full-featured app with working game mechanics, AI-assisted sprite generation, entity physics, and polished UX.
+
+The cost is 20x higher, but the output went from "demo that crashes" to "app you could actually ship."
+
+### Creative Leaps
+
+In a frontend design test, the harness was tasked with building a Dutch art museum website. By iteration 10, the generator had reimagined the entire interface as a **3D spatial experience** — CSS perspective rendering, free-form artwork positioning, and doorway-style navigation. No single-pass agent would have arrived at that.
+
+The feedback loop didn't just fix bugs — it pushed the agent to be more *creative*.
+
+## What Changed with Better Models
+
+When Anthropic upgraded from Opus 4.5 to Opus 4.6, something interesting happened: parts of the harness became unnecessary.
+
+- **Sprint decomposition was removed** — The newer model could handle longer, more complex tasks without needing work broken into tiny sprints
+- **QA became conditional** — The evaluator was most valuable at task boundaries where models struggle, not for every small step
+- **Longer single sessions** — Automatic context compaction replaced manual resets
+
+This is a key takeaway: **harness design assumptions expire.** As models improve, scaffolding that compensated for limitations becomes dead weight. Regularly reassess what's still needed.
+
+## Five Lessons for Building Agent Systems
+
+### 1. Every Component Should Earn Its Place
+If a piece of your harness doesn't address a documented failure mode, remove it. Complexity should be load-bearing, not decorative.
+
+### 2. Evaluators Need Calibration
+Out-of-the-box LLMs are bad judges. You need iterative prompt refinement — test the evaluator against cases where you *know* the right answer, and fix its judgment until it's reliable.
+
+### 3. Criteria Language Shapes Output
+Telling the evaluator to look for "museum quality designs" didn't just change scores — it changed what the generator *built*. The words in your evaluation criteria are a steering mechanism, not just a rubric.
+
+### 4. Feedback Loops Beat Iteration Count
+Quality converges based on the *quality of feedback*, not the number of cycles. Five rounds of specific, actionable critique beat fifteen rounds of vague "try harder."
+
+### 5. The Design Space Expands
+As models get better, the interesting question isn't "what scaffolding can we remove?" — it's "what new agent combinations are now possible?" Better models don't simplify harness design; they open up new possibilities.
+
+## When Should You Use This Pattern?
+
+Multi-agent harnesses make sense when:
+
+- The task is **too complex for a single pass** (full-stack apps, polished UIs, complex games)
+- **Quality matters more than speed** — you're willing to trade time and cost for significantly better output
+- The work involves **subjective judgment** (design, UX, architecture) where self-evaluation fails
+- You need the agent to make **creative leaps**, not just implement a spec
+
+For quick scripts, simple CRUD apps, or well-defined tasks? A single agent is fine. Don't over-engineer.
+
+## The Bottom Line
+
+The harness pattern — splitting AI work into generator and evaluator roles with structured feedback loops — is one of the most effective ways to get production-quality output from AI agents today. It's not cheap and it's not fast, but for complex work, the quality difference is dramatic.
+
+The real insight isn't any specific architecture. It's that **the way you structure agent collaboration matters as much as the model's raw capability.** A well-designed harness with a good model beats a great model working alone.
+
+*This post is based on [Anthropic's engineering blog post](https://www.anthropic.com/engineering/harness-design-long-running-apps) by Prithvi Rajasekaran.*
