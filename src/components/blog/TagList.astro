@@ -1,5 +1,6 @@
 ---
 import { slugify } from '../../utils/slugify';
+import { withBase } from '../../utils/url';
 
 interface Props {
   tags: string[];
@@ -11,7 +12,7 @@ const { tags } = Astro.props;
 <div class="flex flex-wrap gap-2">
   {tags.map((tag) => (
     <a
-      href={`/tag/${slugify(tag)}`}
+      href={withBase(`/tag/${slugify(tag)}`)}
       class="inline-block px-3 py-1.5 rounded-lg text-xs font-medium bg-surface-100 text-muted hover:bg-surface-200 hover:text-ink transition-colors"
     >
       #{tag}

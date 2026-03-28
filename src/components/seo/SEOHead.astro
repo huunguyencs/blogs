@@ -1,4 +1,6 @@
 ---
+import { withBase } from '../../utils/url';
+
 interface Props {
   title: string;
   description: string;
@@ -33,7 +35,7 @@ const imageURL = new URL(image, Astro.site);
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="sitemap" href="/sitemap-index.xml" />
-<link rel="alternate" type="application/rss+xml" title={siteName} href="/rss.xml" />
+<link rel="alternate" type="application/rss+xml" title={siteName} href={withBase("/rss.xml")} />
 
 <title>{fullTitle}</title>
 <meta name="description" content={description} />

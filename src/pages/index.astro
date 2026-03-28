@@ -7,6 +7,7 @@ import { getPublishedPosts, getCategories, getPostsByCategory } from '../utils/p
 import { slugify } from '../utils/slugify';
 import { getReadingTime } from '../utils/readingTime';
 import { formatDate } from '../utils/posts';
+import { withBase } from '../utils/url';
 
 const allPosts = await getPublishedPosts();
 const featuredPosts = allPosts.filter((p) => p.data.featured);
@@ -59,7 +60,7 @@ const latestFiltered = allPosts.filter(p => !highlightIds.has(p.id)).slice(0, 6)
           <div class="lg:col-span-4 flex flex-col gap-6">
             {secondaryHighlights.map((post, i) => (
               <a
-                href={`/blog/${post.id}`}
+                href={withBase(`/blog/${post.id}`)}
                 class="group relative isolate flex-1 overflow-hidden rounded-3xl bg-surface-900 animate-fade-up"
                 style={`animation-delay: ${(i + 1) * 100}ms`}
               >
@@ -107,7 +108,7 @@ const latestFiltered = allPosts.filter(p => !highlightIds.has(p.id)).slice(0, 6)
           <div class="flex items-center gap-4 mb-10">
             <span class="text-[11px] font-bold tracking-[0.2em] uppercase text-muted">Latest Articles</span>
             <div class="flex-1 h-px bg-border"></div>
-            <a href="/blog" class="text-[11px] font-bold tracking-[0.2em] uppercase text-muted hover:text-ink transition-colors">
+            <a href={withBase("/blog")} class="text-[11px] font-bold tracking-[0.2em] uppercase text-muted hover:text-ink transition-colors">
               View all &rarr;
             </a>
           </div>
@@ -156,7 +157,7 @@ const latestFiltered = allPosts.filter(p => !highlightIds.has(p.id)).slice(0, 6)
                     <div class="flex items-center justify-between mb-6">
                       <h2 class="font-display text-3xl text-ink tracking-tight">{category}</h2>
                       <a
-                        href={`/category/${slugify(category)}`}
+                        href={withBase(`/category/${slugify(category)}`)}
                         class="text-[11px] font-bold tracking-[0.2em] uppercase text-muted hover:text-ink transition-colors"
                       >
                         All &rarr;
@@ -164,7 +165,7 @@ const latestFiltered = allPosts.filter(p => !highlightIds.has(p.id)).slice(0, 6)
                     </div>
 
                     <!-- Topic hero card -->
-                    <a href={`/blog/${topicHero.id}`} class="group block">
+                    <a href={withBase(`/blog/${topicHero.id}`)} class="group block">
                       <div class="aspect-[4/3] overflow-hidden rounded-2xl bg-gradient-to-br from-surface-100 to-surface-200 mb-4">
                         {topicHero.data.image && (
                           <img

@@ -1,5 +1,6 @@
 ---
 import { slugify } from '../../utils/slugify';
+import { withBase } from '../../utils/url';
 
 interface Props {
   category: string;
@@ -8,7 +9,7 @@ interface Props {
 }
 
 const { category, variant = 'default', linked = true } = Astro.props;
-const href = `/category/${slugify(category)}`;
+const href = withBase(`/category/${slugify(category)}`);
 
 const classes = variant === 'light'
   ? 'text-[10px] font-bold tracking-[0.2em] uppercase text-white/60 hover:text-white/90'

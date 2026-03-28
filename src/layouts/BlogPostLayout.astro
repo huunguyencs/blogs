@@ -6,6 +6,7 @@ import ShareButtons from '../components/blog/ShareButtons.astro';
 import { formatDate } from '../utils/posts';
 import { getReadingTime } from '../utils/readingTime';
 import { slugify } from '../utils/slugify';
+import { withBase } from '../utils/url';
 
 interface Props {
   title: string;
@@ -50,7 +51,7 @@ const readingTime = getReadingTime(rawContent);
     <!-- Article header -->
     <header class="max-w-3xl mx-auto px-6 lg:px-10 pt-10 lg:pt-16 pb-8">
       <div class="flex items-center gap-3 mb-6">
-        <a href={`/category/${slugify(category)}`} class="text-[11px] font-bold tracking-[0.2em] uppercase text-primary-600 hover:text-primary-800 transition-colors">
+        <a href={withBase(`/category/${slugify(category)}`)} class="text-[11px] font-bold tracking-[0.2em] uppercase text-primary-600 hover:text-primary-800 transition-colors">
           {category}
         </a>
         <span class="text-surface-300">&middot;</span>
