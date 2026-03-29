@@ -13,6 +13,7 @@ The user provides: $ARGUMENTS
 Expected format: `"topic" [options]`
 
 Options:
+
 - `--publish` — Write directly to published (src/content/blog/) instead of drafts
 - `--urls "url1,url2"` — Include specific URLs as research sources
 - `--category "Name"` — Set the post category
@@ -70,7 +71,6 @@ Before writing, scan existing blog posts to find internal linking opportunities:
 
 ### Step 4: Write Phase
 
-
 Using the research, generate a complete blog post:
 
 1. Create an engaging, SEO-optimized title
@@ -81,7 +81,7 @@ Using the research, generate a complete blog post:
    - Compelling introduction with a hook
    - Well-structured body with H2/H3 headings
    - Practical code examples where relevant
-   - Mermaid diagrams (``` ```mermaid ```) for any flowcharts or architecture visuals. Never use ASCII art — Mermaid is rendered at build time as SVG images.
+   - Mermaid diagrams (` `mermaid ```) for any flowcharts or architecture visuals. Never use ASCII art — Mermaid is rendered at build time as SVG images.
    - Data and insights from research
    - Strong conclusion with takeaways
 6. Follow the frontmatter schema exactly:
@@ -91,11 +91,11 @@ Using the research, generate a complete blog post:
 title: "Post Title"
 description: "Meta description under 160 chars"
 date: YYYY-MM-DD
-author: "Blog Author"
+author: "AI Agent"
 category: "Category Name"
 tags: ["tag1", "tag2"]
 image:
-  src: "https://res.cloudinary.com/CLOUD_NAME/image/upload/blog/slug"  # Cloudinary URL
+  src: "https://res.cloudinary.com/CLOUD_NAME/image/upload/blog/slug" # Cloudinary URL
   alt: "Descriptive alt text"
 featured: false
 draft: false
@@ -153,6 +153,7 @@ Next steps:
 ```
 
 This will:
+
 1. Research Hono.js REST API development
 2. Search Unsplash for a relevant image, upload to Cloudinary
 3. Write a ~1500 word post with code examples and Cloudinary image URL

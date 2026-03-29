@@ -11,6 +11,7 @@ You are an expert blog writer. Generate a complete, SEO-optimized blog post in M
 The user provides: $ARGUMENTS
 
 This can be:
+
 - A topic string (you'll do quick research first)
 - Research output from the /research command
 - A topic with flags like: `--publish`, `--category "Name"`, `--tags "tag1,tag2"`, `--no-image`
@@ -25,10 +26,12 @@ This can be:
    b. From the search results, pick the most relevant Unsplash photo URL (looks like `https://unsplash.com/photos/...`)
    c. Use WebFetch on that Unsplash page to extract the direct image URL (contains `images.unsplash.com/photo-...`). Also note the photographer's name.
    d. Upload to Cloudinary using the helper script:
-      ```bash
-      npx tsx scripts/upload-cloudinary.ts "DIRECT_IMAGE_URL" "SLUG"
-      ```
-      The script outputs JSON like: `{"url":"https://res.cloudinary.com/...","public_id":"blog/slug",...}`
+
+   ```bash
+   npx tsx scripts/upload-cloudinary.ts "DIRECT_IMAGE_URL" "SLUG"
+   ```
+
+   The script outputs JSON like: `{"url":"https://res.cloudinary.com/...","public_id":"blog/slug",...}`
    e. Parse the JSON output and use the `url` field as the image `src` in frontmatter.
    f. If Unsplash fails, try: `site:pexels.com [topic keywords] photo` as fallback.
    g. If Cloudinary upload fails (e.g., missing credentials), warn the user and leave image as a placeholder path `/images/blog/{slug}.jpg`.
@@ -52,12 +55,12 @@ This can be:
 ---
 title: "Your Post Title Here"
 description: "A concise meta description under 160 characters for SEO."
-date: YYYY-MM-DD  # Today's date
-author: "Blog Author"
-category: "Category Name"  # Title Case
-tags: ["tag1", "tag2", "tag3"]  # lowercase, hyphenated
+date: YYYY-MM-DD # Today's date
+author: "AI Agent"
+category: "Category Name" # Title Case
+tags: ["tag1", "tag2", "tag3"] # lowercase, hyphenated
 image:
-  src: "https://res.cloudinary.com/CLOUD_NAME/image/upload/..."  # Cloudinary URL from upload
+  src: "https://res.cloudinary.com/CLOUD_NAME/image/upload/..." # Cloudinary URL from upload
   alt: "Descriptive alt text for the hero image"
 featured: false
 draft: false
@@ -70,8 +73,8 @@ draft: false
 - **Structure**: Use H2 (`##`) and H3 (`###`) headings. These generate the table of contents and are important for SEO.
 - **Introduction**: Start with a compelling hook — a question, statistic, or bold statement
 - **Body**: Well-organized sections with clear headings. Include practical examples.
-- **Code Blocks**: Use fenced code blocks with language tags (```typescript, ```css, etc.) for any code examples
-- **Diagrams**: Use Mermaid (``` ```mermaid ```) for all diagrams and flowcharts. Never use ASCII art — it renders poorly. Mermaid is rendered at build time as SVG images.
+- **Code Blocks**: Use fenced code blocks with language tags (`typescript, `css, etc.) for any code examples
+- **Diagrams**: Use Mermaid (` `mermaid ```) for all diagrams and flowcharts. Never use ASCII art — it renders poorly. Mermaid is rendered at build time as SVG images.
 - **Conclusion**: End with key takeaways or a call to action
 - **Tone**: Authoritative but conversational. Write for developers/tech professionals.
 

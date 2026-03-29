@@ -2,9 +2,10 @@
 title: "Designing Rate Limiters at Scale"
 description: "How to build distributed rate limiters that handle millions of requests using token buckets, sliding windows, and Redis-backed architectures."
 date: 2026-03-28
-author: "Blog Author"
+author: "AI Agent"
 category: "System Design"
-tags: ["rate-limiting", "distributed-systems", "redis", "api-design", "scalability"]
+tags:
+  ["rate-limiting", "distributed-systems", "redis", "api-design", "scalability"]
 image:
   src: "https://res.cloudinary.com/huunguyencs/image/upload/v1774708312/blog/designing-rate-limiters-at-scale.jpg"
   alt: "Server racks in a data center representing distributed rate limiting infrastructure"
@@ -113,13 +114,13 @@ Best suited for traffic shaping scenarios where downstream systems require a ste
 
 ## Choosing the Right Algorithm
 
-| Algorithm | Burst Tolerance | Memory | Accuracy | Best For |
-|-----------|----------------|--------|----------|----------|
-| Fixed Window | High at edges | Very Low | Low | Internal/non-critical APIs |
-| Sliding Window Log | None | High | Perfect | Security-sensitive endpoints |
-| Sliding Window Counter | Low-Medium | Low | High | Public APIs at scale |
-| Token Bucket | Controlled | Low | High | Developer-facing APIs |
-| Leaky Bucket | None | Low | High | Traffic shaping |
+| Algorithm              | Burst Tolerance | Memory   | Accuracy | Best For                     |
+| ---------------------- | --------------- | -------- | -------- | ---------------------------- |
+| Fixed Window           | High at edges   | Very Low | Low      | Internal/non-critical APIs   |
+| Sliding Window Log     | None            | High     | Perfect  | Security-sensitive endpoints |
+| Sliding Window Counter | Low-Medium      | Low      | High     | Public APIs at scale         |
+| Token Bucket           | Controlled      | Low      | High     | Developer-facing APIs        |
+| Leaky Bucket           | None            | Low      | High     | Traffic shaping              |
 
 For most teams building public APIs, **token bucket** or **sliding window counter** will be the right choice. Token bucket if you want to allow controlled bursts, sliding window counter if you want stricter fairness.
 
@@ -164,7 +165,7 @@ Distributed rate limiters force you to pick a position on the CAP spectrum:
 
 **Eventual consistency** means nodes may temporarily disagree on counts. You get lower latency and higher availability, but allow temporary overages. For most rate limiting use cases, slightly overshooting the limit is acceptable — you're protecting against abuse, not billing to the exact request.
 
-In practice, most systems choose eventual consistency with periodic synchronization. Ably's distributed rate limiter, for example, uses a centralized Account Master model where nodes report stats roughly every two seconds and receive suppression factors in return. The key insight from their implementation: track "counterfactual" stats — messages that *would have* been sent if rejections hadn't occurred — to prevent oscillatory behavior where the rate bounces between zero and excessive levels.
+In practice, most systems choose eventual consistency with periodic synchronization. Ably's distributed rate limiter, for example, uses a centralized Account Master model where nodes report stats roughly every two seconds and receive suppression factors in return. The key insight from their implementation: track "counterfactual" stats — messages that _would have_ been sent if rejections hadn't occurred — to prevent oscillatory behavior where the rate bounces between zero and excessive levels.
 
 ### Handling Race Conditions
 

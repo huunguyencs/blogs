@@ -68,13 +68,13 @@ With options:
 /blog "Kubernetes pod autoscaling strategies" --category "DevOps" --tags "kubernetes,scaling,infrastructure" --publish
 ```
 
-| Flag | Description |
-|------|-------------|
-| `--publish` | Save directly to published posts (skips draft) |
-| `--category "Name"` | Set the post category (Title Case) |
-| `--tags "a,b,c"` | Set post tags (lowercase) |
-| `--urls "url1,url2"` | Include specific URLs as research sources |
-| `--no-image` | Skip image search and Cloudinary upload |
+| Flag                 | Description                                    |
+| -------------------- | ---------------------------------------------- |
+| `--publish`          | Save directly to published posts (skips draft) |
+| `--category "Name"`  | Set the post category (Title Case)             |
+| `--tags "a,b,c"`     | Set post tags (lowercase)                      |
+| `--urls "url1,url2"` | Include specific URLs as research sources      |
+| `--no-image`         | Skip image search and Cloudinary upload        |
 
 ### `/research "topic"` — Research Only
 
@@ -157,20 +157,19 @@ Posts are MDX files with YAML frontmatter:
 
 ```yaml
 ---
-title: "Your Post Title"                    # Required — keep under 60 chars
+title: "Your Post Title" # Required — keep under 60 chars
 description: "A compelling meta description" # Required — must be under 160 chars
-date: 2026-03-28                             # Required
-author: "Blog Author"                        # Optional — defaults to "Blog Author"
-category: "System Design"                    # Required — Title Case, fully dynamic
-tags: ["typescript", "tutorial"]              # Optional — lowercase
+date: 2026-03-28 # Required
+author: "AI Agent" # Optional — defaults to "AI Agent"
+category: "System Design" # Required — Title Case, fully dynamic
+tags: ["typescript", "tutorial"] # Optional — lowercase
 image:
-  src: "https://res.cloudinary.com/..."      # Cloudinary URL or local path
-  alt: "Descriptive alt text"                # Required if image is set
-featured: true                               # Optional — shows in hero section
-draft: false                                 # Optional — hidden from listings if true
-canonicalURL: "https://..."                  # Optional — for cross-posted content
+  src: "https://res.cloudinary.com/..." # Cloudinary URL or local path
+  alt: "Descriptive alt text" # Required if image is set
+featured: true # Optional — shows in hero section
+draft: false # Optional — hidden from listings if true
+canonicalURL: "https://..." # Optional — for cross-posted content
 ---
-
 Your markdown content here...
 ```
 
@@ -213,6 +212,7 @@ Autonomous QA agent that uses Chrome browser automation to test the blog UI. It 
 ```
 
 Requires:
+
 - Dev server running (`npm run dev`)
 - [Claude-in-Chrome extension](https://chromewebstore.google.com/detail/claude-in-chrome) installed
 
@@ -229,14 +229,14 @@ If you prefer writing without AI:
 
 ## Tech Stack
 
-| Technology | Purpose |
-|------------|---------|
-| [Astro 6](https://astro.build) | Static site generator |
-| [Tailwind CSS v4](https://tailwindcss.com) | Styling |
-| [@tailwindcss/typography](https://github.com/tailwindlabs/tailwindcss-typography) | Prose/article styling |
-| [MDX](https://mdxjs.com) | Markdown + JSX components |
-| [Cloudinary](https://cloudinary.com) | Image hosting + CDN + optimization |
-| [Claude Code](https://claude.ai/claude-code) | AI blog generation agent |
+| Technology                                                                        | Purpose                            |
+| --------------------------------------------------------------------------------- | ---------------------------------- |
+| [Astro 6](https://astro.build)                                                    | Static site generator              |
+| [Tailwind CSS v4](https://tailwindcss.com)                                        | Styling                            |
+| [@tailwindcss/typography](https://github.com/tailwindlabs/tailwindcss-typography) | Prose/article styling              |
+| [MDX](https://mdxjs.com)                                                          | Markdown + JSX components          |
+| [Cloudinary](https://cloudinary.com)                                              | Image hosting + CDN + optimization |
+| [Claude Code](https://claude.ai/claude-code)                                      | AI blog generation agent           |
 
 ## License
 

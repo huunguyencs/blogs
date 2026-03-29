@@ -2,7 +2,7 @@
 title: "AI Harness Design for Long-Running Apps"
 description: "How splitting AI agents into generators and evaluators creates feedback loops that produce dramatically better software."
 date: 2026-03-28
-author: "Blog Author"
+author: "AI Agent"
 category: "AI Engineering"
 tags: ["ai-agents", "claude", "software-architecture", "llm", "agentic-coding"]
 image:
@@ -25,6 +25,7 @@ Here's how it works, broken down simply.
 As an AI agent works longer, its context window fills up. The model starts to "feel" cramped — it rushes to finish, cuts corners, or stops mid-task. Think of it like writing a novel on a whiteboard that's almost full. You start abbreviating, skipping details, and wrapping up prematurely.
 
 **Solutions:**
+
 - **Context resets** — Wipe the slate clean and start fresh with a summary of progress
 - **Context compaction** — Summarize older context in-place to free up room while maintaining continuity
 
@@ -32,18 +33,18 @@ As an AI agent works longer, its context window fills up. The model starts to "f
 
 Ask an AI to review its own work and it'll say "looks great!" almost every time. This is like grading your own homework — you're blind to your own mistakes, especially on subjective tasks like UI design or code architecture.
 
-**Solution:** Use a *separate* agent as the evaluator. External critique consistently outperforms self-review.
+**Solution:** Use a _separate_ agent as the evaluator. External critique consistently outperforms self-review.
 
 ## The Architecture: Split Generator and Evaluator
 
 The core insight is simple: **don't let one agent do everything.** Instead, split responsibilities:
 
-| Role | Job |
-|------|-----|
-| **Generator** | Writes the code, builds features |
+| Role          | Job                                          |
+| ------------- | -------------------------------------------- |
+| **Generator** | Writes the code, builds features             |
 | **Evaluator** | Tests the output, provides specific feedback |
 
-The evaluator doesn't just eyeball the code — it uses tools like Playwright to actually *run* the application, take screenshots, click buttons, and file detailed bug reports. The generator then iterates based on this feedback.
+The evaluator doesn't just eyeball the code — it uses tools like Playwright to actually _run_ the application, take screenshots, click buttons, and file detailed bug reports. The generator then iterates based on this feedback.
 
 This creates a feedback loop: build → test → critique → fix → repeat. Typically 5–15 cycles for frontend work.
 
@@ -52,12 +53,15 @@ This creates a feedback loop: build → test → critique → fix → repeat. Ty
 For complex full-stack apps, Anthropic extended this to three agents:
 
 ### Planner
-Takes a short prompt ("build a game maker") and expands it into a full product spec. It focuses on *what* to build, not *how* — describing features and user experience rather than implementation details.
+
+Takes a short prompt ("build a game maker") and expands it into a full product spec. It focuses on _what_ to build, not _how_ — describing features and user experience rather than implementation details.
 
 ### Generator
+
 Implements features in sprints using a React + FastAPI + PostgreSQL stack. It maintains version control with git and does a quick self-check before handing off to QA.
 
 ### Evaluator
+
 Runs the actual application with Playwright, testing against pre-agreed "sprint contracts" — clear success criteria negotiated before each development cycle. It grades across four dimensions:
 
 - **Product depth** — Does it do what it should?
@@ -81,7 +85,7 @@ The cost is 20x higher, but the output went from "demo that crashes" to "app you
 
 In a frontend design test, the harness was tasked with building a Dutch art museum website. By iteration 10, the generator had reimagined the entire interface as a **3D spatial experience** — CSS perspective rendering, free-form artwork positioning, and doorway-style navigation. No single-pass agent would have arrived at that.
 
-The feedback loop didn't just fix bugs — it pushed the agent to be more *creative*.
+The feedback loop didn't just fix bugs — it pushed the agent to be more _creative_.
 
 ## What Changed with Better Models
 
@@ -96,18 +100,23 @@ This is a key takeaway: **harness design assumptions expire.** As models improve
 ## Five Lessons for Building Agent Systems
 
 ### 1. Every Component Should Earn Its Place
+
 If a piece of your harness doesn't address a documented failure mode, remove it. Complexity should be load-bearing, not decorative.
 
 ### 2. Evaluators Need Calibration
-Out-of-the-box LLMs are bad judges. You need iterative prompt refinement — test the evaluator against cases where you *know* the right answer, and fix its judgment until it's reliable.
+
+Out-of-the-box LLMs are bad judges. You need iterative prompt refinement — test the evaluator against cases where you _know_ the right answer, and fix its judgment until it's reliable.
 
 ### 3. Criteria Language Shapes Output
-Telling the evaluator to look for "museum quality designs" didn't just change scores — it changed what the generator *built*. The words in your evaluation criteria are a steering mechanism, not just a rubric.
+
+Telling the evaluator to look for "museum quality designs" didn't just change scores — it changed what the generator _built_. The words in your evaluation criteria are a steering mechanism, not just a rubric.
 
 ### 4. Feedback Loops Beat Iteration Count
-Quality converges based on the *quality of feedback*, not the number of cycles. Five rounds of specific, actionable critique beat fifteen rounds of vague "try harder."
+
+Quality converges based on the _quality of feedback_, not the number of cycles. Five rounds of specific, actionable critique beat fifteen rounds of vague "try harder."
 
 ### 5. The Design Space Expands
+
 As models get better, the interesting question isn't "what scaffolding can we remove?" — it's "what new agent combinations are now possible?" Better models don't simplify harness design; they open up new possibilities.
 
 ## When Should You Use This Pattern?
@@ -127,4 +136,4 @@ The harness pattern — splitting AI work into generator and evaluator roles wit
 
 The real insight isn't any specific architecture. It's that **the way you structure agent collaboration matters as much as the model's raw capability.** A well-designed harness with a good model beats a great model working alone.
 
-*This post is based on [Anthropic's engineering blog post](https://www.anthropic.com/engineering/harness-design-long-running-apps) by Prithvi Rajasekaran.*
+_This post is based on [Anthropic's engineering blog post](https://www.anthropic.com/engineering/harness-design-long-running-apps) by Prithvi Rajasekaran._
