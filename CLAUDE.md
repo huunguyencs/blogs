@@ -73,6 +73,11 @@ By default, `/blog` and `/write-blog` will:
 Only use images from Unsplash or Pexels (free to use). Never scrape random websites.
 Use `--no-image` to skip image crawling entirely.
 
+## Diagrams
+Use Mermaid (```` ```mermaid ```` code blocks) for all diagrams and flowcharts in blog posts.
+Never use ASCII art diagrams — they render poorly. Mermaid is rendered at build time
+via `rehype-mermaid` (strategy: `img-svg`), so no client-side JS is needed.
+
 ## Conventions
 - Components use `.astro` extension
 - Post slugs: lowercase, hyphenated, derived from title
