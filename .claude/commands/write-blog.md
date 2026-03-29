@@ -71,6 +71,7 @@ draft: false
 - **Introduction**: Start with a compelling hook — a question, statistic, or bold statement
 - **Body**: Well-organized sections with clear headings. Include practical examples.
 - **Code Blocks**: Use fenced code blocks with language tags (```typescript, ```css, etc.) for any code examples
+- **Diagrams**: Use Mermaid (``` ```mermaid ```) for all diagrams and flowcharts. Never use ASCII art — it renders poorly. Mermaid is rendered at build time as SVG images.
 - **Conclusion**: End with key takeaways or a call to action
 - **Tone**: Authoritative but conversational. Write for developers/tech professionals.
 

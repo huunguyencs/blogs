@@ -81,6 +81,7 @@ Using the research, generate a complete blog post:
    - Compelling introduction with a hook
    - Well-structured body with H2/H3 headings
    - Practical code examples where relevant
+   - Mermaid diagrams (``` ```mermaid ```) for any flowcharts or architecture visuals. Never use ASCII art — Mermaid is rendered at build time as SVG images.
    - Data and insights from research
    - Strong conclusion with takeaways
 6. Follow the frontmatter schema exactly:
@@ -143,6 +144,7 @@ Next steps:
 - [ ] Hero image uploaded to Cloudinary and URL is in frontmatter
 - [ ] Image alt text is descriptive and includes topic keywords
 - [ ] Internal links to related existing posts where relevant (1-3 links)
+- [ ] Diagrams use Mermaid code blocks, not ASCII art
 
 ## Example
 

@@ -20,7 +20,9 @@
     "astro": "^6.1.1",
     "cloudinary": "^2.9.0",
     "dotenv": "^17.3.1",
+    "playwright": "^1.58.2",
     "reading-time": "^1.5.0",
+    "rehype-mermaid": "^3.0.0",
     "tailwindcss": "^4.2.2"
   },
   "devDependencies": {
