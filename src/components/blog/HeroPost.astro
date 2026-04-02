@@ -16,7 +16,7 @@ interface Props {
 
 const { title, description, date, category, image, slug, rawContent } = Astro.props;
 const readingTime = getReadingTime(rawContent);
-const href = withBase(`/blog/${slug}`);
+const href = withBase(`/${slug}`);
 ---
 
 <a href={href} class="group block relative isolate overflow-hidden rounded-3xl bg-surface-900">

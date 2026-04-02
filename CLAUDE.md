@@ -15,7 +15,7 @@ src/content/blog/      — Published blog posts (MDX)
 src/content/drafts/    — Draft blog posts (MDX)
 src/content.config.ts  — Content collection schema (Astro 5+ location)
 src/components/        — Astro components (layout/, blog/, seo/, ui/)
-src/layouts/           — Page layouts (Base, BlogPost, BlogList)
+src/layouts/           — Page layouts (Base, BlogPost)
 src/pages/             — Route pages
 src/utils/             — Helper functions
 src/styles/global.css  — Tailwind theme and global styles

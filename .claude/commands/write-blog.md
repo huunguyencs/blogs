@@ -44,7 +44,7 @@ This can be:
    - Use Glob to list all files in `src/content/blog/*.mdx`
    - For each file, read the frontmatter (first 15 lines) to get title, category, tags
    - Identify related posts by category, tags, or topic overlap
-   - When writing, naturally link to related posts: `[title](/blog/slug)`
+   - When writing, naturally link to related posts: `[title](/blogs/slug)`
    - Aim for 1-3 internal links per post. Skip if no posts exist or none are relevant.
 
 4. **Generate the Blog Post** following these requirements:

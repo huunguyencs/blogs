@@ -12,7 +12,7 @@ The user provides: $ARGUMENTS
 
 This can be:
 - Empty (full site audit at http://localhost:4321)
-- A specific URL (e.g., `http://localhost:4321/blog/my-post`)
+- A specific URL (e.g., `http://localhost:4321/blogs/my-post`)
 - A focus area (e.g., `"hero section"`, `"mobile"`, `"blog post page"`)
 
 ## Phase 1: Analyze

@@ -12,7 +12,7 @@ interface Props {
 }
 
 const { title, date, category, image, slug } = Astro.props;
-const href = withBase(`/blog/${slug}`);
+const href = withBase(`/${slug}`);
 ---
 
 <a href={href} class="group flex gap-5 items-start py-5 border-b border-border last:border-0">

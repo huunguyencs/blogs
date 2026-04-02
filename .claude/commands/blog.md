@@ -62,10 +62,10 @@ Before writing, scan existing blog posts to find internal linking opportunities:
    - Same or overlapping category
    - Shared tags
    - Conceptually related subjects (e.g., "rate limiting" relates to "API design")
-4. Keep a list of related posts with their titles and slugs: `[title](/blog/slug)`
+4. Keep a list of related posts with their titles and slugs: `[title](/blogs/slug)`
 5. When writing the article, naturally link to these related posts where relevant. For example:
-   - "As covered in [our guide to database indexing](/blog/database-indexing-strategies), ..."
-   - "This pairs well with [event-driven architecture patterns](/blog/event-driven-architecture-patterns)."
+   - "As covered in [our guide to database indexing](/blogs/database-indexing-strategies), ..."
+   - "This pairs well with [event-driven architecture patterns](/blogs/event-driven-architecture-patterns)."
 6. Aim for 1-3 internal links per post where relevant. Don't force links if no existing posts relate.
 7. If no existing posts are found (empty blog), skip this step.
 

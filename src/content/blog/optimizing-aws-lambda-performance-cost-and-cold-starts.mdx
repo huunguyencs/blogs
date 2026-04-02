@@ -215,7 +215,7 @@ export const handler = async (event: APIGatewayEvent) => {
 };
 ```
 
-For relational databases, use **RDS Proxy** to manage connection pooling. This eliminates the overhead of establishing new database connections on each invocation and prevents connection exhaustion under high concurrency — a pattern closely related to [designing scalable distributed systems](/blog/designing-rate-limiters-at-scale).
+For relational databases, use **RDS Proxy** to manage connection pooling. This eliminates the overhead of establishing new database connections on each invocation and prevents connection exhaustion under high concurrency — a pattern closely related to [designing scalable distributed systems](/blogs/designing-rate-limiters-at-scale).
 
 ### Lazy Loading and Deferred Initialization
 
