@@ -1,6 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
-import BlogListLayout from '../../layouts/BlogListLayout.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
 
 if (import.meta.env.PROD) {
   return Astro.redirect('/404');
@@ -10,7 +10,7 @@ const drafts = await getCollection('drafts');
 const sorted = drafts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 ---
 
-<BlogListLayout title="Drafts" description="Draft posts — preview only">
+<BaseLayout title="Drafts" description="Draft posts — preview only">
   {sorted.length === 0 ? (
     <p class="text-neutral-500 text-center py-12">No drafts yet.</p>
   ) : (
@@ -26,4 +26,4 @@ const sorted = drafts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf
       ))}
     </ul>
   )}
-</BlogListLayout>
+</BaseLayout>
