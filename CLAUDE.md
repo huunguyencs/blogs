@@ -112,10 +112,20 @@ CLOUDINARY_API_SECRET=your_api_secret
 Upload script: `npx tsx scripts/upload-cloudinary.ts <image-url> <slug>`
 Images are stored in the `blog/` folder on Cloudinary with auto format/quality.
 
+## URL Routing
+
+The site uses `base: "/blogs"` in `astro.config.mjs`. **All routes are prefixed with `/blogs`.**
+
+- Published post: `http://localhost:4321/blogs/{slug}`
+- Draft preview: `http://localhost:4321/blogs/drafts/{slug}`
+- Internal links in MDX: `/blogs/{slug}/`
+
+After creating a draft, always provide the preview link — not the file path.
+
 ## Commands
 
 ```bash
-npm run dev      # Start dev server at localhost:4321
+npm run dev      # Start dev server at localhost:4321/blogs/
 npm run build    # Build static site to dist/
 npm run preview  # Preview built site
 ```

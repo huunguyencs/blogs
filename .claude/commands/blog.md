@@ -63,9 +63,9 @@ Before writing, scan existing blog posts to find internal linking opportunities:
    - Shared tags
    - Conceptually related subjects (e.g., "rate limiting" relates to "API design")
 4. Keep a list of related posts with their titles and slugs: `[title](/blogs/slug)`
-5. When writing the article, naturally link to these related posts where relevant. For example:
-   - "As covered in [our guide to database indexing](/blogs/database-indexing-strategies), ..."
-   - "This pairs well with [event-driven architecture patterns](/blogs/event-driven-architecture-patterns)."
+5. When writing the article, naturally link to these related posts where relevant. The site uses `base: "/blogs"`, so all internal links must be prefixed with `/blogs/`. For example:
+   - "As covered in [our guide to database indexing](/blogs/database-indexing-strategies/), ..."
+   - "This pairs well with [event-driven architecture patterns](/blogs/event-driven-architecture-patterns/)."
 6. Aim for 1-3 internal links per post where relevant. Don't force links if no existing posts relate.
 7. If no existing posts are found (empty blog), skip this step.
 
@@ -125,9 +125,8 @@ Blog post created successfully!
   Sources:  [number] sources referenced
 
 Next steps:
-  - Review the post at [file path]
+  - Preview: http://localhost:4321/blogs/drafts/[slug] (draft) or http://localhost:4321/blogs/[slug] (published)
   - [If draft] Run /publish [slug] when ready to publish
-  - Run `npm run dev` to preview locally
 ```
 
 ## Quality Checklist (verify before saving)
@@ -143,6 +142,7 @@ Next steps:
 - [ ] Slug is clean (no special characters)
 - [ ] Hero image uploaded to Cloudinary and URL is in frontmatter
 - [ ] Image alt text is descriptive and includes topic keywords
+- [ ] Internal links use `/blogs/{slug}/` prefix (site base path is `/blogs`)
 - [ ] Internal links to related existing posts where relevant (1-3 links)
 - [ ] Diagrams use Mermaid code blocks, not ASCII art
 
